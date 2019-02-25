@@ -56,7 +56,6 @@ class Face(object):
             for face in face_list:
 
                 file_base= os.path.basename(face)
-                print(file_base, "    ", self._ID)
 
                 if file_base[:-4] == self._ID:
 
