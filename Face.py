@@ -46,19 +46,19 @@ class Face(object):
 
     def face_analyze(self):
         try:
-            # Load a sample picture and learn how to recognize it.
-            # face_recognition.load_image_file(file, mode='RGB') -> Loads an image file (.jpg, .png, etc) into a numpy array
 
+            # Load a sample picture and learn how to recognize it.
             face_path = '/home/kb/Keras/Side_Project/Face/Image/'
 
             face_list = glob.glob(os.path.join(face_path, "*"))
 
             for face in face_list:
 
-                file_base= os.path.basename(face)
+                file_base = os.path.basename(face)
 
                 if file_base[:-4] == self._ID:
 
+                    # face_recognition.load_image_file(file, mode='RGB') -> Loads an image file (.jpg, .png, etc) into a numpy array
                     file_image = face_recognition.load_image_file(face)
 
 	    		    # Create arrays of known face encodings and their names
@@ -71,6 +71,10 @@ class Face(object):
 
                     frame = self.face_drawing(match, distance)
 
+                else:
+                    print("No such ID in database !\n")
+                    exit(0)
+
             return frame
 
         except Exception as e:
@@ -80,22 +84,21 @@ class Face(object):
     def face_drawing(self, result, distance):
         try:
             # Initialize some variables
-            face_names = []
             name = "Unknown"
 
             # If matches the specfic face in the dataset
             if True in result:
                 # Append the name if matches
                 name = self._ID
-
-            face_names.append(name)
+            else:
+                name = "ID not in Database"
 
             # Returns an array of bounding boxes of human faces in a image
             ID_locations = face_recognition.face_locations(self._image, model="cnn")
 
             # Display the results
-            # zip: https://github.com/KBLin1996/Python_Practice/edit/master/basic_python.py 
-            for(top, right, bottom, left), name in zip(ID_locations, face_names):
+            # zip: https://github.com/KBLin1996/Python_Practice/edit/master/basic_python.py
+            for (top, right, bottom, left) in ID_locations:
 
                 # Draw a box around the face, color -> (B,G,R)
                 # Change showing color here -> if OK (green), else if Maybe (yellow), else Unknown (red)
@@ -105,14 +108,17 @@ class Face(object):
 
                     # Draw a label with a name below the face, color -> (B,G,R)
                     cv2.rectangle(self._image, (left, bottom), (right, bottom + 35), (0, 205, 0), cv2.FILLED)
+                    prediction = "Pass"
 
                 elif distance > 0.45 and distance <= 0.5:
                     cv2.rectangle(self._image, (left, top), (right, bottom), (0, 215, 255), 2)
                     cv2.rectangle(self._image, (left, bottom), (right, bottom + 35), (0, 215, 255), cv2.FILLED)
+                    prediction = "Maybe"
 
                 else:
                     cv2.rectangle(self._image, (left, top), (right, bottom), (0, 0, 255), 2)
                     cv2.rectangle(self._image, (left, bottom), (right, bottom + 35), (0, 0, 255), cv2.FILLED)
+                    prediction = "Fail"
 
                 # cv2.putText(frame, test, coordinate (text's bottom-left), font, size, text color, text breadth, line options (optional))
                 cv2.putText(self._image, name, (left + 6, bottom + 29), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
@@ -121,7 +127,11 @@ class Face(object):
                 height = height - int(height / 40)
                 width = int(width / 40)
 
-                info = 'ID:' + self._ID + ', Similarity:'+ str(round(100 - distance * 100, 2)) + '%'
+                info = "Similarity: " + str(round(100 - distance * 100, 2)) + '%'
+                cv2.putText(self._image, info, (width, height), cv2.FONT_HERSHEY_COMPLEX, 1, (40, 200, 255), 2)
+
+                height = height - int(height / 10) 
+                info = "Result: " + prediction
                 cv2.putText(self._image, info, (width, height), cv2.FONT_HERSHEY_COMPLEX, 1, (40, 200, 255), 2)
 
             return self._image
