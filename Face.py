@@ -7,24 +7,28 @@ import click
 import base64
 import numpy as np
 import face_recognition
+from PIL import ImageDraw, ImageFont, Image
 
 class Face(object):
 
-    def from_backend(self, ID, image_src):
+    def from_backend(self, ID, image_src, Name):
 
-        self._Start = time.time() # Timer Started
+        Start = time.time() # Timer Started
 
         try:
             decode_image = base64.b64decode(image_src)
             img_array = np.fromstring(decode_image, np.uint8)
             self._image = cv2.imdecode(img_array, cv2.COLOR_BGR2RGB)
+
+            ID = ID[:3] + '****' + ID[7:]
             self._ID = ID
+            self._name = Name
             print("Transmission Success !\n")
 
             frame = self.face_analyze()
 
             End = time.time() # Timer Ended
-            click.echo("Overall Time: %f sec" % (End - self._Start))
+            click.echo("Overall Time: %f sec" % (End - Start))
 
             return frame
 
@@ -56,7 +60,7 @@ class Face(object):
 
                 file_base = os.path.basename(face)
 
-                if file_base[:-4] == self._ID:
+                if file_base[:-4] == self._name:
 
                     # face_recognition.load_image_file(file, mode='RGB') -> Loads an image file (.jpg, .png, etc) into a numpy array
                     file_image = face_recognition.load_image_file(face)
@@ -69,11 +73,12 @@ class Face(object):
                     match = face_recognition.compare_faces([known_encoding], ID_encoding, tolerance=0.45)
                     distance = self.face_distance(known_encoding, ID_encoding)
 
-                    frame = self.face_drawing(match, distance)
-
                 else:
                     print("No such ID in database !\n")
-                    exit(0)
+                    distance = 0.999999
+                    match = False
+
+                frame = self.face_drawing(match, distance)
 
             return frame
 
@@ -84,14 +89,14 @@ class Face(object):
     def face_drawing(self, result, distance):
         try:
             # Initialize some variables
-            name = "Unknown"
+            name = "Sys Error"
 
             # If matches the specfic face in the dataset
             if True in result:
                 # Append the name if matches
-                name = self._ID
+                name = self._name
             else:
-                name = "ID not in Database"
+                name = "ID Unknown"
 
             # Returns an array of bounding boxes of human faces in a image
             ID_locations = face_recognition.face_locations(self._image, model="cnn")
@@ -120,8 +125,14 @@ class Face(object):
                     cv2.rectangle(self._image, (left, bottom), (right, bottom + 35), (0, 0, 255), cv2.FILLED)
                     prediction = "Fail"
 
+                font = ImageFont.truetype('NotoSansCJK-Black.ttc', 26)
+                image_PIL = Image.fromarray(cv2.cvtColor(self._image, cv2.COLOR_BGR2RGB))  
+                draw_name = ImageDraw.Draw(image_PIL)
+                draw_name.text((int((left + right) / 2 - 36), bottom - 3), name, fill=(255, 255, 255), font=font)
+                self._image = cv2.cvtColor(np.asarray(image_PIL), cv2.COLOR_RGB2BGR)
+
                 # cv2.putText(frame, test, coordinate (text's bottom-left), font, size, text color, text breadth, line options (optional))
-                cv2.putText(self._image, name, (left + 6, bottom + 29), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
+#                cv2.putText(self._image, name, (left + 6, bottom + 29), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
 
                 height, width, dimension = self._image.shape
                 height = height - int(height / 40)
@@ -132,6 +143,10 @@ class Face(object):
 
                 height = height - int(height / 10) 
                 info = "Result: " + prediction
+                cv2.putText(self._image, info, (width, height), cv2.FONT_HERSHEY_COMPLEX, 1, (40, 200, 255), 2)
+
+                height = height - int(height / 10) 
+                info = "ID: " + self._ID
                 cv2.putText(self._image, info, (width, height), cv2.FONT_HERSHEY_COMPLEX, 1, (40, 200, 255), 2)
 
             return self._image
