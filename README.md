@@ -14,11 +14,14 @@
 ---
 
 **Result:**
-1. Prediction Picture
+1. HTML Display
+![image](https://github.com/KBLin1996/NIAG_FaceVerification/blob/master/Display.jpg)
+
+2. Prediction Picture
 
 
 ![image](https://github.com/KBLin1996/NIAG_FaceVerification/blob/master/Result/A123456789.jpg)
 
-2. Json Result
+3. Json Result
 
 ![image](https://github.com/KBLin1996/NIAG_FaceVerification/blob/master/Json_result.jpg)
