@@ -15,6 +15,7 @@
 
 **Result:**
 1. HTML Display
+
 ![image](https://github.com/KBLin1996/NIAG_FaceVerification/blob/master/Display.jpg)
 
 2. Prediction Picture
