@@ -7,7 +7,7 @@
 **Execute:**
 1. python server.py
 2. ↓↓↓ On postman, please follow ↓↓↓
-![image](https://github.com/KBLin1996/NIAG_FaceVerification-Local/blob/master/R.jpg)
+![image](https://github.com/KBLin1996/NIAG_FaceVerification-Local/blob/master/Request.jpg)
 
 
 **Result:** python server.py
