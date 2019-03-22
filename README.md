@@ -15,6 +15,8 @@
 
 **Result:**
 1. Prediction Picture
+
+
 ![image](https://github.com/KBLin1996/NIAG_FaceVerification/blob/master/Result/A123456789.jpg)
 
 2. Json Result
