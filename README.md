@@ -10,4 +10,6 @@
 ![image](https://github.com/KBLin1996/NIAG_FaceVerification-Local/blob/master/Request.jpg)
 
 
-**Result:** python server.py
+
+**Result:**
+1. Prediction Picture
