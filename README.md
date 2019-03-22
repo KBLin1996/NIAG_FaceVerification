@@ -2,7 +2,8 @@
 
 **Description:** 
 1. Face Verification (based on face_recognition), Face Detection -> Hog
-2. After executing, you will need to send POST request in 'postman' with a url=http://127.0.0.1:5000/company and acquire the picture result in /Result, also a .json discription in http://127.0.0.1:5000/company/result
+2. After executing, send a POST request on 'Postman' with an url=http://127.0.0.1:5000/company. It will acquire the picture result in /Result, also a .json discription on http://127.0.0.1:5000/company/result (See it on Postman)
+3. 
 
 ---
 
