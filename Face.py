@@ -52,7 +52,8 @@ class Face(object):
     def face_analyze(self):
         try:
             # Load a sample picture and learn how to recognize it.
-            face_path = 'D:/face_final/Image'
+	    face_path = os.getcwd()
+            face_path = os.path.join(face_path, "Image")
 
             face_list = glob.glob(os.path.join(face_path, "*"))
             flag = 0
