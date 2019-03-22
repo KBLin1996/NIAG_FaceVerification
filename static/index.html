@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="//cdn.bootcss.com/socket.io/1.5.1/socket.io.min.js"></script>
+</head>
+<body>
+<!--
+	Ideally these elements aren't created until it's confirmed that the 
+	client supports video/camera, but for the sake of illustrating the 
+	elements involved, they are created with markup (not JavaScript)
+-->
+<video id="video" width="640" height="480" autoplay></video>
+<button id="snap" style = "display:none">Snap Photo</button>
+<img id = 'resultimg' style = "visibility:hidden;" src='/Users/siaoweiwei/Documents/school/face/tmpimg/output.jpg' style="width:480px;height:360;"></img>
+<!-- <img id = 'beginimg' style = "visibility:hidden;" src='/Users/siaoweiwei/Documents/school/face/tmpimg/begin.jpg' style="width:640px;height:400px;"></img> -->
+<canvas id="canvas" style = "display:none" width="640" height="480"></canvas>
+<p id=result></p>
+<!-- <script src='https://code.jquery.com/jquery-3.3.1.min.js'> -->
+<!-- </script> -->
+<script>
+  
+// Grab elements, create settings, etc.
+var video = document.getElementById('video');
+
+// Get access to the camera!
+if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    // Not adding `{ audio: true }` since we only want video now
+    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+        //video.src = window.URL.createObjectURL(stream);
+        video.srcObject = stream;
+        video.play();
+    });
+}
+// Elements for taking the snapshot
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
+var video = document.getElementById('video');
+
+// Trigger photo take
+document.getElementById("snap").addEventListener("click", detect);
+
+function detect() {
+  $('#resultimg').css('visibility', 'visible');
+  context.drawImage(video, 0, 0, 640, 480);
+  var encodedImg = canvas.toDataURL();
+  $.post('/current/card/', {id: $('#card_id').val()})
+
+  $.post('/recognize', {encodedImg: encodedImg}, function(result) {
+    console.log(result);
+    $("#resultimg").attr("src", result);
+    <!-- $('#result').html(result); -->
+  });
+}
+
+$(document).keypress(
+  function(event){
+    if(event.which == '13'){
+      event.preventDefault();
+      detect();
+    }
+})
+<!-- setInterval(detect, 500); -->
+
+$(document).ready(function() {
+        <!-- $("#resultimg").show(); -->
+        namespace = '/public';
+        var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+        socket.on('server_response', function(res) {
+          console.log(res.data);
+        });
+        socket.on('server_got_card', function(res) {
+          console.log(res.data);
+          $('#card_id').val(res.data);
+          detect();
+        });
+});
+</script>
+
+
+
+<form>
+  Card ID: <input type=text id=card_id name=card_id>
+</form>
+
+</body>
+
+</html>
+
+
+<!-- <div> -->
+<!--   Card ID: <input type=text id=card_id name=card_id> -->
+<!-- </div> -->
+
+<!-- <form method=POST action=/current/card/> -->
+  
+<!--   Card ID: <input type=text name=card_id> -->
+<!--   <1!-- Name: <input type=text name=name> --1> -->
+<!--   <input type=submit> -->
+<!-- </form> -->
