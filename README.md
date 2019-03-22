@@ -20,4 +20,5 @@
 ![image](https://github.com/KBLin1996/NIAG_FaceVerification/blob/master/Result/A123456789.jpg)
 
 2. Json Result
+
 ![image](https://github.com/KBLin1996/NIAG_FaceVerification/blob/master/Json_result.jpg)
